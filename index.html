@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menü</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #f39c12;
+            --background-color: #fef5e7;
+            --text-color: #333;
+            --card-color: #fff;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --border-radius: 15px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background-color: var(--card-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .menu-item {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .menu-item:hover .item-image img {
+            transform: scale(1.1);
+        }
+
+        .item-content {
+            padding: 20px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item-name {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .item-price {
+            font-size: 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .item-category {
+            display: inline-block;
+            background-color: #f1f1f1;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .item-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .category-header {
+            text-align: center;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            grid-column: 1 / -1;
+        }
+
+        .image-gallery {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .menu-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 80%;
+            }
+
+            .language-selector {
+                position: static;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* RTL support for Arabic */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="rtl"] .language-selector {
+            right: auto;
+            left: 20px;
+        }
+
+        [dir="rtl"] .item-header {
+            flex-direction: row-reverse;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="de">DE</button>
+                <button class="lang-btn" data-lang="ar">AR</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+            <h1 id="header-title">Restaurant Menü</h1>
+            <p id="header-subtitle">Genießen Sie unsere ausgewählte Auswahl an köstlichen Pizzen und Salaten</p>
+        </header>
+
+        <div class="filters">
+            <button class="filter-btn active" data-category="all" data-key="all">Alle anzeigen</button>
+            <button class="filter-btn" data-category="Pizza" data-key="pizzaOnly">Nur Pizzen</button>
+            <button class="filter-btn" data-category="Salad" data-key="saladsOnly">Nur Salate</button>
+        </div>
+
+        <div id="menu-container" class="menu-container">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // JSON data
+        const menuData = [
+            {
+                "name": "Margherita Supreme",
+                "description": "A delightful blend of classic Margherita flavors with a twist of gourmet toppings. This pizza features a rich tomato sauce, fresh mozzarella, basil leaves, and a sprinkle of parmesan cheese, all topped with sun-dried tomatoes and a drizzle of balsamic glaze. Perfect for those who love a balance of traditional and contemporary tastes.",
+                "category": "Pizza",
+                "price": 12.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "BBQ Chicken Delight",
+                "description": "A savory pizza that combines the smoky flavors of BBQ sauce with tender grilled chicken, red onions, and cilantro. Topped with a blend of mozzarella and cheddar cheese, this pizza is a crowd-pleaser for those who enjoy a hearty and flavorful meal.",
+                "category": "Pizza",
+                "price": 14.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1593246049226-ded77bf90326?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Veggie Lovers' Paradise",
+                "description": "A colorful and nutritious pizza loaded with a variety of fresh vegetables including bell peppers, mushrooms, olives, spinach, and cherry tomatoes. Finished with a sprinkle of feta cheese and a touch of oregano, this pizza is perfect for vegetarians and veggie enthusiasts.",
+                "category": "Pizza",
+                "price": 13.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                ]
+            },
+            {
+                "name": "Pepperoni Feast",
+                "description": "A classic favorite featuring a generous layer of spicy pepperoni slices atop a bed of melted mozzarella cheese and tangy tomato sauce. This pizza is a must-have for meat lovers looking for a satisfying and flavorful option.",
+                "category": "Pizza",
+                "price": 11.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1628840042765-356cda07504e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                ]
+            },
+            {
+                "name": "Hawaiian Tropic",
+                "description": "A sweet and savory combination of ham, pineapple chunks, and mozzarella cheese on a crispy crust. This pizza offers a tropical twist that is sure to delight those who enjoy a mix of flavors.",
+                "category": "Pizza",
+                "price": 13.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Four Cheese Extravaganza",
+                "description": "A cheese lover's dream come true, this pizza features a blend of four different cheeses: mozzarella, cheddar, parmesan, and gorgonzola. Baked to perfection on a garlic butter crust, it's rich, creamy, and utterly indulgent.",
+                "category": "Pizza",
+                "price": 15.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1595708684082-a173bb3a06c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Spicy Italian Sausage",
+                "description": "A bold and flavorful pizza topped with spicy Italian sausage, roasted red peppers, onions, and a blend of mozzarella and provolone cheese. Finished with a sprinkle of red pepper flakes for an extra kick.",
+                "category": "Pizza",
+                "price": 14.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1601924582970-9238bcb495d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                ]
+            },
+            {
+                "name": "Mediterranean Delight",
+                "description": "A fresh and vibrant pizza featuring ingredients like artichoke hearts, sun-dried tomatoes, Kalamata olives, red onions, and a sprinkle of feta cheese. Drizzled with olive oil and a touch of oregano for a true Mediterranean flavor.",
+                "category": "Pizza",
+                "price": 14.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1595708684082-a173bb3a06c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                ]
+            },
+            {
+                "name": "Buffalo Chicken Blast",
+                "description": "A spicy and tangy pizza topped with buffalo sauce-coated chicken, red onions, and a blend of mozzarella and blue cheese. Finished with a drizzle of ranch dressing for the perfect balance of flavors.",
+                "category": "Pizza",
+                "price": 15.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1593246049226-ded77bf90326?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                ]
+            },
+            {
+                "name": "Mushroom Truffle Magic",
+                "description": "An elegant pizza featuring a variety of mushrooms sautéed in truffle oil, garlic, and herbs. Topped with mozzarella and parmesan cheese, this pizza is a sophisticated choice for mushroom lovers.",
+                "category": "Pizza",
+                "price": 16.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1601924582970-9238bcb495d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Classic Caesar Salad",
+                "description": "Crisp romaine lettuce tossed with creamy Caesar dressing, crunchy croutons, and shaved parmesan cheese. A timeless salad that pairs perfectly with any meal.",
+                "category": "Salad",
+                "price": 7.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Greek Salad",
+                "description": "A refreshing mix of cucumbers, tomatoes, red onions, Kalamata olives, and feta cheese, all tossed in a light vinaigrette dressing. A taste of the Mediterranean in every bite.",
+                "category": "Salad",
+                "price": 8.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1607532941433-304659e8198a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Quinoa Power Bowl",
+                "description": "A nutrient-packed salad featuring quinoa, mixed greens, cherry tomatoes, avocado, black beans, corn, and a zesty lime dressing. Perfect for a healthy and satisfying meal.",
+                "category": "Salad",
+                "price": 9.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Caprese Salad",
+                "description": "A simple yet elegant salad made with fresh mozzarella, ripe tomatoes, basil leaves, and a drizzle of balsamic glaze. A classic Italian favorite.",
+                "category": "Salad",
+                "price": 8.99,
+                "image": [
+                    "https://images.unsplash.com/photo-1467003909585-2f8a72700288?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            },
+            {
+                "name": "Spinach and Strawberry Salad",
+                "description": "A delightful combination of baby spinach, fresh strawberries, almonds, and goat cheese, all tossed in a light poppy seed dressing. A perfect blend of sweet and savory flavors.",
+                "category": "Salad",
+                "price": 9.49,
+                "image": [
+                    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+                ]
+            }
+        ];
+
+        // Translations
+        const translations = {
+            de: {
+                title: "Restaurant Menü",
+                subtitle: "Genießen Sie unsere ausgewählte Auswahl an köstlichen Pizzen und Salaten",
+                all: "Alle anzeigen",
+                pizzaOnly: "Nur Pizzen",
+                saladsOnly: "Nur Salate",
+                pizza: "Pizza",
+                salad: "Salat",
+                currency: "€"
+            },
+            en: {
+                title: "Restaurant Menu",
+                subtitle: "Enjoy our selected range of delicious pizzas and salads",
+                all: "Show all",
+                pizzaOnly: "Pizzas only",
+                saladsOnly: "Salads only",
+                pizza: "Pizza",
+                salad: "Salad",
+                currency: "€"
+            },
+            ar: {
+                title: "قائمة المطعم",
+                subtitle: "استمتع بمجموعتنا المختارة من البيتزا والسلطات اللذيذة",
+                all: "عرض الكل",
+                pizzaOnly: "البيتزا فقط",
+                saladsOnly: "السلطات فقط",
+                pizza: "بيتزا",
+                salad: "سلطة",
+                currency: "€"
+            }
+        };
+
+        let currentLang = 'de';
+
+        // Function to change language
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Update UI texts
+            document.getElementById('header-title').textContent = translations[lang].title;
+            document.getElementById('header-subtitle').textContent = translations[lang].subtitle;
+
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const key = btn.getAttribute('data-key');
+                btn.textContent = translations[lang][key];
+            });
+
+            // Re-render menu items with new language
+            const activeCategory = document.querySelector('.filter-btn.active').getAttribute('data-category');
+            renderMenuItems(activeCategory);
+
+            // Update active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+        }
+
+        // Function to render menu items
+        function renderMenuItems(category = 'all') {
+            const menuContainer = document.getElementById('menu-container');
+            menuContainer.innerHTML = '';
+
+            // Filter items by category
+            const filteredItems = category === 'all'
+                ? menuData
+                : menuData.filter(item => item.category === category);
+
+            // Group items by category
+            const categorizedItems = {};
+            filteredItems.forEach(item => {
+                if (!categorizedItems[item.category]) {
+                    categorizedItems[item.category] = [];
+                }
+                categorizedItems[item.category].push(item);
+            });
+
+            // Display items with category headers
+            for (const category in categorizedItems) {
+                const categoryHeader = document.createElement('h2');
+                categoryHeader.className = 'category-header';
+                categoryHeader.textContent = translations[currentLang][category.toLowerCase()];
+                menuContainer.appendChild(categoryHeader);
+
+                categorizedItems[category].forEach(item => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+
+                    menuItem.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.image[0]}" alt="${item.name}">
+                        </div>
+                        <div class="item-content">
+                            <div class="item-header">
+                                <h3 class="item-name">${item.name}</h3>
+                                <span class="item-price">${translations[currentLang].currency}${item.price.toFixed(2)}</span>
+                            </div>
+                            <span class="item-category">${translations[currentLang][item.category.toLowerCase()]}</span>
+                            <p class="item-description">${item.description}</p>
+                            <div class="image-gallery">
+                                ${item.image.map((img, index) =>
+                        `<img src="${img}" class="thumbnail ${index === 0 ? 'active' : ''}" alt="${item.name} ${index + 1}">`
+                    ).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                    // Add click event to thumbnails
+                    const thumbnails = menuItem.querySelectorAll('.thumbnail');
+                    const mainImage = menuItem.querySelector('.item-image img');
+
+                    thumbnails.forEach(thumb => {
+                        thumb.addEventListener('click', function () {
+                            mainImage.src = this.src;
+                            thumbnails.forEach(t => t.classList.remove('active'));
+                            this.classList.add('active');
+                        });
+                    });
+
+                    menuContainer.appendChild(menuItem);
+                });
+            }
+        }
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function () {
+            renderMenuItems();
+
+            // Add event listeners to filter buttons
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    // Filter items by selected category
+                    const category = this.getAttribute('data-category');
+                    renderMenuItems(category);
+                });
+            });
+
+            // Add event listeners to language buttons
+            document.querySelectorAll('.lang-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
